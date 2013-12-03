@@ -1,0 +1,29 @@
+Package: StatRank
+Type: Package
+Title: Statistical Rank Aggregation: Inference, Evaluation, and Visualization
+Version: 0.0.3
+Date: 2013-11-21
+Author: Hossein Azari Soufiani, William Chen
+Maintainer: William Chen <williamzc@gmail.com>
+Description: This package implements Generalized Method of Moments and Maximal
+    Likelihood methods for Random Utility Models. These methods are meant to
+    provide inference on rank comparison data. These methods accept full,
+    partial, and pairwise rankings, and provides methods to break down full or
+    partial rankings into their pairwise components. Please see Generalized
+    Method-of-Moments for Rank Aggregation from NIPS 2013 for a description of
+    some of our methods.
+License: GPL (>= 2)
+Depends:
+    truncdist
+Suggests:
+    ggplot2,
+    gridExtra,
+    grid,
+    testthat
+Collate:
+    'Evaluation.R'
+    'Helpers.R'
+    'Visualization.R'
+    'RandomUtilityModels.R'
+    'election-data.R'
+    'test-data.R'
