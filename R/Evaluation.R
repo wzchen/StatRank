@@ -93,3 +93,42 @@ Evaluation.Precision.at.k <- function(EstimatedRank, RelevanceLevel, k)
   Ordered.RelevanceLevel <- RelevanceLevel[order(-EstimatedRank)]
   mean(Ordered.RelevanceLevel[1:k])
 }
+
+################################################################################
+# Predictive Modeling Metrics
+################################################################################
+
+
+#' Calculates KL divergence between empirical pairwise preferences
+#' and modeled pairwise preferences
+#' 
+#' @param Data.pairs data broken up into pairs using Breaking function
+#' @param m number of alternatives
+#' @param Estimate estimation object from an Estimate function
+#' @param get.pairwise.prob Function that given two alternatives from 
+#' the the Parameters argument, returns back a model probability that one is larger than the other 
+#' @return the KL divergence between modeled and empirical pairwise preferences, 
+#' thinking of the probabilities as a probability distribution over the (n choose 2) pairs
+#' @export
+#' @examples
+#' data(Data.Test)
+#' Data.Test.pairs <- Breaking(Data.Test, "full")
+#' m <- 5
+#' Estimate <- Estimation.PL.GMM(Data.Test.pairs, m)
+#' Evaluation.KL(Data.Test.pairs, m, Estimate, PL.Pairwise.Prob)
+Evaluation.KL <- function(Data.pairs, m, Estimate, get.pairwise.prob) { 
+  # empirical
+  C.matrix.empirical <- generateC(Data.pairs, m)
+  for(i in 1:(m-1)) for(j in (i+1):m) C.matrix.empirical[i, j] <- C.matrix.empirical[i, j] / (C.matrix.empirical[i, j] + C.matrix.empirical[j, i])
+  C.empirical <- turn_matrix_into_table(C.matrix.empirical)
+  
+  # model
+  C.matrix.model <- matrix(0, nrow = m, ncol = m)
+  for(i in 1:m) for(j in 1:m) if(i != j) C.matrix.model[i, j] <- get.pairwise.prob(Estimate$Parameters[[i]], Estimate$Parameters[[j]])
+  C.model <- turn_matrix_into_table(C.matrix.model)
+  
+  # calculate KL
+  P <- C.empirical['prob'] / sum(C.empirical['prob'])
+  Q <- C.model['prob'] / sum(C.model['prob'])
+  sum(log(P/Q)*P)
+}

@@ -456,3 +456,98 @@ turn_matrix_into_table <- function(A) {
   transcribed.table
 }
 
+################################################################################
+# Calculating Pairwise Probabilities
+################################################################################
+
+
+#' Pairwise Probability for PL Model
+#' 
+#' Given alternatives a and b (both items from the inference object)
+#' what is the probability that a beats b?
+#' 
+#' @param a list containing parameters for a
+#' @param b list containing parameters for b
+#' @return probability that a beats b
+#' @export
+PL.Pairwise.Prob <- function(a, b) a$Mean / (a$Mean + b$Mean)
+
+#' Pairwise Probability for Zemel
+#' 
+#' Given alternatives a and b (both items from the inference object)
+#' what is the probability that a beats b?
+#' 
+#' @param a list containing parameters for a
+#' @param b list containing parameters for b
+#' @return probability that a beats b
+#' @export
+Zemel.Pairwise.Prob <- function(a, b){
+  # the means here are actually the scores
+  exp(a$Mean - b$Mean) / (exp(a$Mean - b$Mean) + exp(b$Mean - a$Mean))
+}
+
+#' Pairwise Probability for Normal Model
+#' 
+#' Given alternatives a and b (both items from the inference object)
+#' what is the probability that a beats b?
+#' 
+#' @param a list containing parameters for a
+#' @param b list containing parameters for b
+#' @return probability that a beats b
+#' @export
+Normal.Pairwise.Prob <- function(a, b) {
+  # Let W = X - Y
+  if(is.null(a[["Variance"]])) a$Variance <- 1
+  if(is.null(b[["Variance"]])) b$Variance <- 1
+  
+  mu <- a$Mean - b$Mean
+  sigma <- sqrt(a$Variance + b$Variance)
+  #P(X - Y > 0)
+  1 - pnorm(-mu/sigma)
+}
+
+#' Pairwise Probability for Normal Multitype Model
+#' 
+#' Given alternatives a and b (both items from the inference object)
+#' what is the probability that a beats b?
+#' 
+#' @param a list containing parameters for a
+#' @param b list containing parameters for b
+#' @return probability that a beats b
+#' @export
+Normal.MultiType.Pairwise.Prob <- function(a, b) {
+  mean.grid <- expand.grid(a$Mean, b$Mean)
+  variance.grid <- expand.grid(a$Variance, b$Variance)
+  gamma.grid <- expand.grid(a$Gamma, b$Gamma)
+  n <- nrow(mean.grid)
+  
+  probs <- rep(NA, n)
+  for(i in 1:n) {
+    probs[i] <- Normal.Pairwise.Prob(list(Mean = mean.grid[i, 1], Variance = variance.grid[i, 1]), list(Mean = mean.grid[i, 2], Variance = variance.grid[i, 2]))
+    probs[i] <- probs[i] * prod(gamma.grid[i, ])
+  }
+  sum(probs)
+}
+
+#' Pairwise Probability for PL Multitype Model
+#' 
+#' Given alternatives a and b (both items from the inference object)
+#' what is the probability that a beats b?
+#' 
+#' @param a list containing parameters for a
+#' @param b list containing parameters for b
+#' @return probability that a beats b
+#' @export
+Expo.MultiType.Pairwise.Prob <- function(a, b) {
+  mean.grid <- expand.grid(a$Mean, b$Mean)
+  n <- nrow(mean.grid)
+  
+  probs <- rep(NA, n)
+  for(i in 1:n) {
+    probs[i] <- PL.Pairwise.Prob(list(Mean = mean.grid[i, 1]), list(Mean = mean.grid[i, 2]))
+    probs[i] <- probs[i] * prod(mean.grid[i, ])
+  }
+  sum(probs)
+}
+
+

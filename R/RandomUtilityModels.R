@@ -530,7 +530,7 @@ Estimation.RUM.MLE = function(Data, iter = 10, dist)
   ###
   
   #;list(Aggregated.Rank=RT$ix, Mean=MM,Variance=VV,LogLikelihood=ll,Time=DT) 
-  ;list(Aggregated.Rank=RT$ix, Mean=MM, SD=VV^.5, Time=DT, Parameters = params) 
+  ;list(Aggregated.Rank=RT$ix, Mean=MM[iter,], SD=VV^.5, Time=DT, Parameters = params) 
   
 }
 
@@ -769,7 +769,7 @@ PdfModel = function(X,parameter)
 #' @examples
 #' data(Data.Test)
 #' Data.Test.pairs <- Breaking(Data.Test, "full")
-#' Estimation.PL.GMM(Data.Test.pairs, 5)
+#' Estimation.PL.GMM(Data.Test.pairs, 5, PL.Pairwise.Prob)
 Estimation.PL.GMM = function(Data.pairs, m, prior = 0)
 {
   transition.matrix <- matrix(data = prior, nrow = m, ncol = m) - prior * m * diag(m)
