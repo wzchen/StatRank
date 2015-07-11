@@ -168,6 +168,6 @@ Generate.Pairwise.Probabilities <- function(Data.pairs, Parameters, get.pairwise
   name.of.data <- tail(strsplit(deparse(substitute(Data.pairs)), "\\.")[[1]], n=1)
   
   
-  grid.arrange(p1, p2, nrow = 1, main = textGrob(paste0("\n", name.of.data, "\nMethod: ", name.of.method, "\nKL divergence: ", kl.divergence, "\nEstimated Ranking: ", toString(reordering)), gp=gpar(cex=2)))
+  grid.arrange(p1, p2, nrow = 1, top = grid::textGrob(paste0("\n", name.of.data, "\nMethod: ", name.of.method, "\nKL divergence: ", kl.divergence, "\nEstimated Ranking: ", toString(reordering)), gp=gpar(cex=2)))
   
 }
